@@ -207,6 +207,68 @@ view_transcript() {
     echo -e "${RED}Transcript file not found: $PROJECT_DIR/runtime/scanner-feed.txt${NC}"
 }
 
+clean_logs() {
+    print_status "Cleaning log data..."
+    
+    # Ask for confirmation
+    echo -e "${YELLOW}WARNING: This will remove all log data including:${NC}"
+    echo "  - CSV event logs in logs/"
+    echo "  - Transcript files in runtime/"
+    echo "  - Raw audit logs in runtime/"
+    echo ""
+    echo -n "Are you sure you want to continue? (y/N): "
+    read -r confirm
+    
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        print_status "Clean cancelled."
+        return 0
+    fi
+    
+    # Clean CSV logs
+    if [ -d "$PROJECT_DIR/logs" ]; then
+        print_status "Removing CSV logs..."
+        rm -f "$PROJECT_DIR/logs/"*.csv 2>/dev/null
+        if [ $? -eq 0 ]; then
+            print_success "CSV logs removed"
+        else
+            print_warning "No CSV logs found or unable to remove"
+        fi
+    else
+        print_warning "Logs directory not found"
+    fi
+    
+    # Clean transcript files
+    if [ -d "$PROJECT_DIR/runtime" ]; then
+        print_status "Removing transcript files..."
+        rm -f "$PROJECT_DIR/runtime/scanner-feed.txt" 2>/dev/null
+        rm -f "$PROJECT_DIR/runtime/scanner-feed.raw.txt" 2>/dev/null
+        if [ $? -eq 0 ]; then
+            print_success "Transcript files removed"
+        else
+            print_warning "No transcript files found or unable to remove"
+        fi
+    else
+        print_warning "Runtime directory not found"
+    fi
+    
+    # Clean temporary segments (optional)
+    if [ -d "$PROJECT_DIR/runtime/segments" ]; then
+        print_status "Cleaning temporary segments..."
+        rm -f "$PROJECT_DIR/runtime/segments/"*.wav 2>/dev/null
+        if [ $? -eq 0 ]; then
+            print_success "Temporary segments cleaned"
+        else
+            print_warning "No segments found or unable to remove"
+        fi
+    fi
+    
+    print_success "Log data cleanup completed!"
+    echo ""
+    echo "Remaining files:"
+    echo "  Logs directory: $(ls "$PROJECT_DIR/logs/" 2>/dev/null | wc -l) files"
+    echo "  Runtime directory: $(ls "$PROJECT_DIR/runtime/" 2>/dev/null | wc -l) files"
+}
+
 # Main script
 case "$1" in
     start)
@@ -227,10 +289,13 @@ case "$1" in
     transcript)
         view_transcript
         ;;
+    clean)
+        clean_logs
+        ;;
     help|--help|-h)
         echo "Scanner Feed Service Manager"
         echo ""
-        echo "Usage: $0 {start|stop|restart|status|logs|transcript|help}"
+        echo "Usage: $0 {start|stop|restart|status|logs|transcript|clean|help}"
         echo ""
         echo "Commands:"
         echo "  start      - Start both Parakeet server and Docker worker"
@@ -239,15 +304,17 @@ case "$1" in
         echo "  status     - Check service status"
         echo "  logs       - View Docker logs in real-time"
         echo "  transcript - View transcript output in real-time"
+        echo "  clean      - Remove all log data (CSV logs, transcripts, audit logs)"
         echo "  help       - Show this help message"
         echo ""
         echo "Examples:"
         echo "  ./scanner-service.sh start"
         echo "  ./scanner-service.sh status"
         echo "  ./scanner-service.sh logs"
+        echo "  ./scanner-service.sh clean"
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|status|logs|transcript|help}"
+        echo "Usage: $0 {start|stop|restart|status|logs|transcript|clean|help}"
         exit 1
         ;;
 esac

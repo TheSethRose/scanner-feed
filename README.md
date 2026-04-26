@@ -49,6 +49,41 @@ curl http://127.0.0.1:49173/health  # Docker worker
 tail -f /Users/sethrose/Developer/Github/scanner-feed/runtime/scanner-feed.txt
 ```
 
+## Service Management
+
+Use the `scanner-service.sh` script for easy service management:
+
+```bash
+# Make script executable (first time only)
+chmod +x scanner-service.sh
+
+# Start the service
+./scanner-service.sh start
+
+# Check service status
+./scanner-service.sh status
+
+# Restart the service
+./scanner-service.sh restart
+
+# Stop the service
+./scanner-service.sh stop
+
+# View Docker logs
+./scanner-service.sh logs
+
+# View transcript output
+./scanner-service.sh transcript
+
+# Clean log data (removes CSV logs, transcripts, audit logs)
+./scanner-service.sh clean
+
+# Show help
+./scanner-service.sh help
+```
+
+**Note:** The `clean` command will remove all log data including CSV event logs, transcript files, and raw audit logs. You will be prompted to confirm before deletion.
+
 ## Run (Legacy)
 ```bash
 python scanner.py
