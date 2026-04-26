@@ -1,6 +1,6 @@
 # Custom
-feeds.txt
-scanner-feed.txt
+feed*.txt
+scanner-feed*.txt
 repomix-output*.xml
 
 # Virtual environments

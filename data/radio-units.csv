@@ -1,0 +1,14 @@
+term_type,canonical,aliases,notes
+unit,Medic 1,medic one|medic 1|medical one|medicorn,EMS unit
+unit,Medic 2,medic two|medic 2|medical two,EMS unit
+unit,Medic 3,medic three|medic 3|medical three,EMS unit
+unit,Engine 1,engine one|engine 1|injun one|major want,Fire unit
+unit,Engine 2,engine two|engine 2|injun two,Fire unit
+unit,Engine 3,engine three|engine 3|injun three,Fire unit
+unit,Command,command|come command|county command,Incident command
+agency,Collin County,collin county|calling county|collin,Agency name
+phrase,on location,on location|on scene|in joanna scenes,Arrival phrase
+phrase,out for investigation,out for investigation|out to investigate,Investigation phrase
+phrase,en route,en route|in route|on route,Response status
+phrase,nothing showing,nothing showing|nothing showin,Initial size-up
+phrase,multifamily dwelling,multifamily dwelling|multi family dwelling|multiple family dwelling,Structure type
