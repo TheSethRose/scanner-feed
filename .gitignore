@@ -1,7 +1,9 @@
-# Custom
+# Custom - Project specific files to ignore
 feed*.txt
 scanner-feed*.txt
 repomix-output*.xml
+runtime/
+logs/
 
 # Virtual environments
 .venv/
@@ -60,10 +62,9 @@ htmlcov/
 ehthumbs.db
 Thumbs.db
 
-# Logs
+# Logs (keep logs/ directory but ignore specific log files if needed)
 *.log
 *.log.*
-logs/
 
 # Database files
 *.sqlite3

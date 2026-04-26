@@ -2,8 +2,26 @@
 
 Live transcription of scanner audio feeds using NVIDIA Parakeet via MLX.
 
-## Install
+## Documentation
 
+Comprehensive documentation is available in the [`docs/`](./docs/) folder:
+
+- **[Prerequisites](./docs/prerequisites.md)** - What you need before starting
+- **[Setup Guide](./docs/setup.md)** - Installation and configuration
+- **[Running the System](./docs/running.md)** - How to start, monitor, and stop
+- **[Data & Logs](./docs/data-logs.md)** - Where to find output files
+- **[Troubleshooting](./docs/troubleshooting.md)** - Common issues and solutions
+- **[Architecture](./docs/architecture.md)** - How the system works
+- **[API Reference](./docs/api-reference.md)** - Developer and API documentation
+
+## Quick Start
+
+### Prerequisites
+- macOS 12.0+ with Apple Silicon (M1/M2/M3)
+- Docker Desktop
+- Homebrew
+
+### Install
 ```bash
 brew install ffmpeg
 python3 -m venv .venv
@@ -11,50 +29,66 @@ source .venv/bin/activate
 pip install -U parakeet-mlx numpy soundfile
 ```
 
-## Run
+### Start System
+```bash
+# Start Parakeet server (native MLX)
+launchctl kickstart -k "gui/$(id -u)/com.scanner-feed.parakeet"
 
+# Start Docker worker
+docker compose up -d
+```
+
+### Check Status
+```bash
+curl http://127.0.0.1:18765/health  # Parakeet server
+curl http://127.0.0.1:49173/health  # Docker worker
+```
+
+### View Transcripts
+```bash
+tail -f /Users/sethrose/Developer/Github/scanner-feed/runtime/scanner-feed.txt
+```
+
+## Run (Legacy)
 ```bash
 python scanner.py
 ```
 
-## Environment Variables
+## Configuration
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `FEED_URL` | `https://broadcastify.cdnstream1.com/31880` | Audio stream URL |
-| `FEEDS_FILE` | unset | File containing one `Name|URL` feed per line |
-| `PARAKEET_MODEL` | `mlx-community/parakeet-tdt-0.6b-v3` | MLX model to load |
-| `WORKDIR` | `/tmp/scanner-parakeet` | Temp chunk directory |
-| `OUTFILE` | `./scanner-feed.txt` | Transcript output path |
-| `RAW_OUTFILE` | `./scanner-feed.raw.txt` | Audit log containing normalized and raw transcripts |
-| `SCANNER_CODES_FILE` | `./data/scanner-codes.csv` | Trimmed CSV reference used for inline radio-code annotations |
-| `RADIO_UNITS_FILE` | `./data/radio-units.csv` | Radio unit, agency, and phrase alias normalization |
-| `RADIO_PHONETICS_FILE` | `./data/radio-phonetics.csv` | Public-safety phonetic spelling normalization |
-| `FFMPEG_AUDIO_FILTER` | voice-band cleanup chain | ffmpeg filter applied before segmentation and transcription |
-| `STARTUP_SKIP_SECONDS` | `0` | Audio seconds to ignore after connecting |
-| `MIN_RMS` | `0.0015` | Minimum audio level to process |
-| `START_SPEECH_SECONDS` | `0.5` | Speech needed before opening a segment |
-| `END_SILENCE_SECONDS` | `0.9` | Silence needed before closing a segment |
-| `PRE_ROLL_SECONDS` | `0.75` | Audio kept before detected speech |
-| `MIN_SEGMENT_SECONDS` | `1.0` | Minimum detected speech segment length |
-| `MAX_SEGMENT_SECONDS` | `18` | Maximum segment length before forced transcription |
-| `MIN_WORDS` | `3` | Minimum words to keep a transcript |
-| `DEDUP_SIMILARITY` | `0.88` | Similarity cutoff for duplicate suppression |
-| `STALE_JOB_SECONDS` | `75` | Drop queued segments older than this |
+See [`docs/api-reference.md`](./docs/api-reference.md) for complete configuration options and environment variables.
 
-## Tuning
+## Quick Reference
 
-Lower `MIN_RMS` if it skips quiet dispatch audio. Higher if it transcribes static.
-
+### System Status
 ```bash
-FEEDS_FILE=feeds.txt python scanner.py
+# Check Parakeet server
+curl http://127.0.0.1:18765/health
+
+# Check Docker worker
+curl http://127.0.0.1:49173/health
+
+# View Docker logs
+docker compose logs -f scanner
 ```
 
-For a noisier but more complete feed, lower `MIN_WORDS` back to `1`.
+### Data Locations
+- **Transcripts:** `/Users/sethrose/Developer/Github/scanner-feed/runtime/scanner-feed.txt`
+- **Raw audit log:** `/Users/sethrose/Developer/Github/scanner-feed/runtime/scanner-feed.raw.txt`
+- **CSV logs:** `/Users/sethrose/Developer/Github/scanner-feed/logs/`
+- **Audio feeds:** `/Users/sethrose/Developer/Github/scanner-feed/feeds.txt`
 
-The main log writes normalized text. The raw audit log keeps both forms:
+### Normalization Examples
+```
+KJ Five INP → KJ5INP
+ten four → 10-4 [Acknowledged]
+seventy one seventy two → seventy one seventy two [71 72]
+```
 
-```text
-normalized: 10-4 [Acknowledged]
-raw: Ten four.
+### Weather Alerts (terminal only)
+```
+WX-1: rotation, hail, storm damage
+WX-2: tornado watch, funnel cloud, severe thunderstorm warning
+WX-3: tornado warning, confirmed tornado
+WX-4: tornado emergency, take shelter, debris signature
 ```

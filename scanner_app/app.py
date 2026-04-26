@@ -5,12 +5,16 @@ import threading
 from .audio import FeedWorker
 from .config import ensure_output_dirs
 from .feeds import load_feeds
+from .health import start_health_server
 from .models import SegmentJob
+from .retention import run_startup_cleanup
 from .transcribe import transcribe_loop
 
 
 def main() -> None:
     ensure_output_dirs()
+    run_startup_cleanup()
+    start_health_server()
     feeds = load_feeds()
     stop_event = threading.Event()
     jobs: queue.Queue[SegmentJob] = queue.Queue(maxsize=200)

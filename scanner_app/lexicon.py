@@ -44,6 +44,67 @@ NUMBER_WORDS = {
     "hundred": 100,
 }
 
+LETTER_SOUNDS = {
+    "a": "A",
+    "ay": "A",
+    "b": "B",
+    "bee": "B",
+    "be": "B",
+    "c": "C",
+    "cee": "C",
+    "sea": "C",
+    "see": "C",
+    "d": "D",
+    "dee": "D",
+    "e": "E",
+    "ee": "E",
+    "f": "F",
+    "eff": "F",
+    "g": "G",
+    "gee": "G",
+    "h": "H",
+    "aitch": "H",
+    "i": "I",
+    "eye": "I",
+    "j": "J",
+    "jay": "J",
+    "k": "K",
+    "kay": "K",
+    "l": "L",
+    "el": "L",
+    "m": "M",
+    "em": "M",
+    "n": "N",
+    "en": "N",
+    "o": "O",
+    "oh": "O",
+    "p": "P",
+    "pee": "P",
+    "q": "Q",
+    "cue": "Q",
+    "queue": "Q",
+    "r": "R",
+    "are": "R",
+    "s": "S",
+    "ess": "S",
+    "t": "T",
+    "tee": "T",
+    "u": "U",
+    "you": "U",
+    "v": "V",
+    "vee": "V",
+    "w": "W",
+    "double": "W",
+    "doubleyou": "W",
+    "x": "X",
+    "ex": "X",
+    "y": "Y",
+    "why": "Y",
+    "z": "Z",
+    "zee": "Z",
+    "zed": "Z",
+}
+
 STRUCTURED_CODE_PREFIXES = ("code", "signal", "priority")
 CODE_WORDS = {word for word in NUMBER_WORDS if word not in {"to", "too", "for"}}
 
@@ -211,17 +272,152 @@ def numbers_from_token(token: str) -> list[int]:
     return []
 
 
+def is_us_ham_callsign(value: str) -> bool:
+    return bool(re.fullmatch(r"(?:[KNW][A-Z]{0,2}|A[A-L][A-Z]?)\d[A-Z]{1,4}", value.upper()))
+
+
+def token_call_chars(token: str, phonetics: dict[str, str]) -> list[str]:
+    lower = token.lower()
+
+    if lower in phonetics:
+        return [phonetics[lower]]
+
+    if lower in LETTER_SOUNDS:
+        return [LETTER_SOUNDS[lower]]
+
+    if lower in NUMBER_WORDS and 0 <= NUMBER_WORDS[lower] <= 9:
+        return [str(NUMBER_WORDS[lower])]
+
+    if lower.isdigit() and len(lower) == 1:
+        return [lower]
+
+    if re.fullmatch(r"[a-z]*\d[a-z]*", lower):
+        chars: list[str] = []
+
+        for char in lower:
+            if char.isdigit():
+                chars.append(char)
+            elif char.isalpha():
+                chars.append(char.upper())
+            else:
+                return []
+
+        return chars
+
+    if re.fullmatch(r"[a-z]{2,4}", lower):
+        return list(lower.upper())
+
+    return []
+
+
+def find_ham_callsign_replacements(text: str, phonetics: dict[str, str]) -> list[tuple[int, int, str]]:
+    tokens = [
+        (match.group(0), match.start(), match.end())
+        for match in re.finditer(r"[a-zA-Z0-9]+", text)
+    ]
+    replacements: list[tuple[int, int, str]] = []
+
+    for index in range(len(tokens)):
+        chars: list[str] = []
+
+        for end_index in range(index, min(len(tokens), index + 6)):
+            token, _token_start, _token_end = tokens[end_index]
+            token_chars = token_call_chars(token, phonetics)
+
+            if not token_chars:
+                break
+
+            chars.extend(token_chars)
+
+            if len(chars) > 7:
+                break
+
+            candidate = "".join(chars).upper()
+
+            if not any(char.isdigit() for char in candidate):
+                continue
+
+            if not is_us_ham_callsign(candidate):
+                continue
+
+            start = tokens[index][1]
+            end = tokens[end_index][2]
+            before = text[max(0, start - 48):start].lower()
+            after = text[end:end + 48].lower()
+
+            if re.search(r"\b(license|plate|tag|registration)\b", before + " " + after):
+                continue
+
+            replacements.append((start, end, candidate))
+
+    return replacements
+
+
+def should_run_ham_callsign_pass(feed_name: str, text: str) -> bool:
+    feed = feed_name.lower()
+    body = text.lower()
+
+    if any(marker in feed for marker in ("ark", "ham", "amateur", "repeater")):
+        return True
+
+    if any(
+        marker in body
+        for marker in (
+            "repeater",
+            "amateur radio",
+            "radio club",
+            "pl tone",
+            "monitoring",
+            "net control",
+            "calling cq",
+        )
+    ):
+        return True
+
+    if re.search(r"\bk\s*5\s*p\s*r\s*k\b", body):
+        return True
+
+    return False
+
+
+def looks_like_address_context(text: str, start: int, end: int) -> bool:
+    before = text[max(0, start - 40):start].lower()
+    after = text[end:end + 64].lower()
+
+    if re.search(r"\b(at|address|resides at|located at|location|near|from|to|on)\s*$", before):
+        return True
+
+    if re.search(
+        r"^\W*(?:[a-z]+\W+){0,4}"
+        r"(street|st|drive|dr|road|rd|avenue|ave|lane|ln|court|ct|"
+        r"boulevard|blvd|circle|cir|trail|tr|way|place|pl)\b",
+        after,
+    ):
+        return True
+
+    return False
+
+
 def find_code_annotations(text: str, scanner_codes: dict[str, ScannerCode]) -> list[tuple[int, int, str]]:
     tokens = token_spans(text)
     annotations: list[tuple[int, int, str]] = []
 
     for index, (token, start, _end) in enumerate(tokens):
         if token == "10" and index + 1 < len(tokens):
-            for number in numbers_from_token(tokens[index + 1][0]):
+            next_token = tokens[index + 1][0]
+            span_end = tokens[index + 1][2]
+
+            if looks_like_address_context(text, start, span_end):
+                continue
+
+            if next_token.startswith("0") and len(next_token) > 1:
+                continue
+
+            for number in numbers_from_token(next_token):
                 key = normalize_code_key(f"10-{number}")
 
                 if key in scanner_codes:
-                    annotations.append((start, tokens[index + 1][2], short_meaning(scanner_codes[key].meaning)))
+                    annotations.append((start, span_end, short_meaning(scanner_codes[key].meaning)))
                     break
 
         if token == "ten":
@@ -295,7 +491,7 @@ def find_code_replacements(text: str, scanner_codes: dict[str, ScannerCode]) -> 
     return replacements
 
 
-def radio_number_from_words(words: list[str]) -> str:
+def radio_number_parts_from_words(words: list[str]) -> list[str]:
     parts: list[str] = []
     index = 0
 
@@ -314,14 +510,55 @@ def radio_number_from_words(words: list[str]) -> str:
             index += 2
             continue
 
-        if value == 100 and parts:
-            parts[-1] = str(int(parts[-1]) * 100)
+        if value == 100:
+            if parts:
+                parts[-1] = str(int(parts[-1]) * 100)
+            else:
+                parts.append("100")
         else:
             parts.append(str(value))
 
         index += 1
 
-    return "".join(parts)
+    return parts
+
+
+def format_radio_number(parts: list[str], before: str, after: str) -> str:
+    context = f"{before} {after}"
+    is_time_context = any(
+        word in context
+        for word in ("received", "receive", "time", "copy", "clear", "see", "timeout")
+    )
+
+    if is_time_context and len(parts) == 1 and re.fullmatch(r"\d{3,4}", parts[0]):
+        value = parts[0].zfill(4)
+        hour = int(value[:2])
+        minute = int(value[2:])
+
+        if 0 <= hour <= 23 and 0 <= minute <= 59:
+            return f"{hour:02d}:{minute:02d}"
+
+    if (
+        is_time_context
+        and len(parts) == 2
+        and all(len(part) == 2 for part in parts)
+    ):
+        hour = int(parts[0])
+        minute = int(parts[1])
+
+        if 0 <= hour <= 23 and 0 <= minute <= 59:
+            return f"{hour:02d}:{minute:02d}"
+
+    if parts and all(len(part) == 2 for part in parts):
+        return " ".join(parts)
+
+    if len(parts) >= 3 and all(len(part) == 1 for part in parts):
+        return "".join(parts)
+
+    if len(parts) == 2 and len(parts[0]) == 1 and len(parts[1]) == 2:
+        return "".join(parts)
+
+    return " ".join(parts)
 
 
 def find_radio_number_replacements(text: str) -> list[tuple[int, int, str]]:
@@ -336,6 +573,13 @@ def find_radio_number_replacements(text: str) -> list[tuple[int, int, str]]:
             if tokens[index][0] not in NUMBER_WORDS or tokens[index][0] == "to":
                 index += 1
                 continue
+
+            if tokens[index][0] == "ten" and index + 1 < len(tokens):
+                next_token = tokens[index + 1][0]
+
+                if next_token in CODE_WORDS or next_token.isdigit():
+                    index += 1
+                    continue
 
             start = index
             groups: list[list[str]] = [[]]
@@ -357,11 +601,17 @@ def find_radio_number_replacements(text: str) -> list[tuple[int, int, str]]:
                 groups[-1].append(current)
                 index += 1
 
-            converted = " to ".join(radio_number_from_words(group) for group in groups if group)
+            start_pos = offset + tokens[start][1]
+            end_pos = offset + tokens[index - 1][2]
+            before = text[max(0, start_pos - 40):start_pos].lower()
+            after = text[end_pos:end_pos + 40].lower()
+            converted = " to ".join(
+                format_radio_number(radio_number_parts_from_words(group), before, after)
+                for group in groups
+                if group
+            )
 
             if converted and (has_separator or len(converted.replace(" to ", "")) >= 4):
-                start_pos = offset + tokens[start][1]
-                end_pos = offset + tokens[index - 1][2]
                 replacements.append((start_pos, end_pos, f"{text[start_pos:end_pos]} [{converted}]"))
 
             if index == start:
@@ -431,7 +681,11 @@ def normalize_radio_language(
     scanner_codes: dict[str, ScannerCode],
     radio_aliases: list[RadioAlias],
     phonetics: dict[str, str],
+    feed_name: str = "",
 ) -> str:
+    if should_run_ham_callsign_pass(feed_name, text):
+        text = replace_spans(text, filter_overlapping_replacements(find_ham_callsign_replacements(text, phonetics)))
+
     text = replace_spans(text, filter_overlapping_replacements(find_phonetic_replacements(text, phonetics)))
     text = replace_spans(text, filter_overlapping_replacements(find_alias_replacements(text, radio_aliases)))
 

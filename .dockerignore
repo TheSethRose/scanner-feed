@@ -1,0 +1,9 @@
+.git
+.venv
+__pycache__
+*.pyc
+logs
+runtime
+scanner-feed*.txt
+repomix-output*.xml
+.DS_Store

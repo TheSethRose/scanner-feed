@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.scanner-feed.parakeet</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/sethrose/Developer/Github/scanner-feed/.venv/bin/python</string>
+    <string>/Users/sethrose/Developer/Github/scanner-feed/parakeet_server.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/sethrose/Developer/Github/scanner-feed</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PARAKEET_SERVER_PORT</key>
+    <string>18765</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/sethrose/Developer/Github/scanner-feed/runtime/parakeet-server.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/sethrose/Developer/Github/scanner-feed/runtime/parakeet-server.err.log</string>
+</dict>
+</plist>

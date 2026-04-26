@@ -1,0 +1,39 @@
+services:
+  scanner:
+    build: .
+    container_name: scanner-feed-worker
+    restart: unless-stopped
+    environment:
+      ASR_SERVER_URL: http://host.docker.internal:18765
+      FEEDS_FILE: /app/feeds.txt
+      WORKDIR: /Users/sethrose/Developer/Github/scanner-feed/runtime/segments
+      LOG_DIR: /Users/sethrose/Developer/Github/scanner-feed/logs
+      OUTFILE: /Users/sethrose/Developer/Github/scanner-feed/runtime/scanner-feed.txt
+      RAW_OUTFILE: /Users/sethrose/Developer/Github/scanner-feed/runtime/scanner-feed.raw.txt
+      HEALTH_PORT: "49173"
+      SCANNER_CODES_FILE: /app/data/scanner-codes.csv
+      RADIO_UNITS_FILE: /app/data/radio-units.csv
+      RADIO_PHONETICS_FILE: /app/data/radio-phonetics.csv
+      CSV_RETENTION_DAYS: "14"
+      CSV_MAX_TOTAL_MB: "500"
+      COMPRESS_OLD_CSV_DAYS: "2"
+      SEGMENT_RETENTION_MINUTES: "10"
+      KEEP_SEGMENTS: "0"
+    ports:
+      - "49173:49173"
+    volumes:
+      - /Users/sethrose/Developer/Github/scanner-feed/runtime:/Users/sethrose/Developer/Github/scanner-feed/runtime
+      - /Users/sethrose/Developer/Github/scanner-feed/logs:/Users/sethrose/Developer/Github/scanner-feed/logs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "-m", "scanner_app.healthcheck", "http://127.0.0.1:49173/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"

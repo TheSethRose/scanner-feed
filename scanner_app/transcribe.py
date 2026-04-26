@@ -3,11 +3,12 @@ import queue
 import re
 import time
 from collections import deque
+from datetime import datetime
 from difflib import SequenceMatcher
 
-from parakeet_mlx import from_pretrained
-
+from .asr import load_model, transcribe_segment
 from .config import (
+    ASR_SERVER_URL,
     DEDUP_SIMILARITY,
     DEDUP_WINDOW_SECONDS,
     MIN_WORDS,
@@ -18,8 +19,12 @@ from .config import (
     RAW_OUTFILE,
     SCANNER_CODES_FILE,
     STALE_JOB_SECONDS,
+    WRITE_RAW_LOG,
+    WRITE_TEXT_LOG,
     debug,
 )
+from .csv_log import append_event_csv, event_metadata
+from .health import mark_loop, mark_transcript
 from .lexicon import (
     load_radio_aliases,
     load_radio_phonetics,
@@ -28,6 +33,7 @@ from .lexicon import (
     normalize_radio_language,
 )
 from .models import RadioAlias, ScannerCode, SegmentJob
+from .weather_alerts import detect_weather_alert, format_terminal_block
 
 
 def normalize_text(text: str) -> str:
@@ -39,25 +45,6 @@ def normalize_text(text: str) -> str:
     text = re.sub(r"\s+([,.!?;:]\s*)", r"\1", text)
     text = re.sub(r"([.!?])\s+", r"\1\n", text)
     return text.strip()
-
-
-def extract_text(result) -> str:
-    if hasattr(result, "sentences") and result.sentences:
-        lines = []
-
-        for sentence in result.sentences:
-            sentence_text = getattr(sentence, "text", "").strip()
-
-            if sentence_text:
-                lines.append(sentence_text)
-
-        if lines:
-            return "\n".join(lines)
-
-    if hasattr(result, "text"):
-        return result.text
-
-    return str(result)
 
 
 def normalized_hash(text: str) -> str:
@@ -110,26 +97,38 @@ class TranscriptWriter:
         recent.append((now, digest, text))
         return False
 
-    def append(self, job: SegmentJob, normalized_text: str, raw_text: str) -> None:
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(job.started_at))
-        block = f"[{timestamp}] [{job.feed_name}]\n{normalized_text}\n\n"
+    def append(self, job: SegmentJob, normalized_text: str, raw_text: str, segment_age_seconds: float) -> None:
+        dt = datetime.fromtimestamp(job.started_at).astimezone()
+        timestamp = dt.strftime("%Y-%m-%d %H:%M:%S")
+        alert = detect_weather_alert(normalized_text)
+        metadata = event_metadata(dt, normalized_text)
+        terminal_block = format_terminal_block(timestamp, job.feed_name, normalized_text, alert=alert)
+        file_block = f"[{timestamp}] [{job.feed_name}]\n{normalized_text}\n\n"
 
-        print(block, end="", flush=True)
+        print(terminal_block, end="", flush=True)
+        append_event_csv(job, raw_text, normalized_text, alert, metadata, segment_age_seconds)
+        mark_transcript()
 
-        with OUTFILE.open("a", encoding="utf-8") as f:
-            f.write(block)
+        if WRITE_TEXT_LOG:
+            with OUTFILE.open("a", encoding="utf-8") as f:
+                f.write(file_block)
 
-        with RAW_OUTFILE.open("a", encoding="utf-8") as f:
-            f.write(
-                f"[{timestamp}] [{job.feed_name}]\n"
-                f"normalized: {normalized_text}\n"
-                f"raw: {raw_text}\n\n"
-            )
+        if WRITE_RAW_LOG:
+            with RAW_OUTFILE.open("a", encoding="utf-8") as f:
+                f.write(
+                    f"[{timestamp}] [{job.feed_name}]\n"
+                    f"normalized: {normalized_text}\n"
+                    f"raw: {raw_text}\n\n"
+                )
 
 
 def transcribe_loop(jobs: queue.Queue[SegmentJob], stop_event) -> None:
-    print(f"Loading model: {MODEL_NAME}", flush=True)
-    model = from_pretrained(MODEL_NAME)
+    if ASR_SERVER_URL:
+        print(f"Using ASR server: {ASR_SERVER_URL}", flush=True)
+    else:
+        print(f"Loading model: {MODEL_NAME}", flush=True)
+
+    model = load_model()
 
     scanner_codes = load_scanner_codes()
     radio_aliases = load_radio_aliases()
@@ -144,6 +143,8 @@ def transcribe_loop(jobs: queue.Queue[SegmentJob], stop_event) -> None:
     print(f"Writing transcript to: {OUTFILE.resolve()}", flush=True)
 
     while not stop_event.is_set():
+        mark_loop()
+
         try:
             job = jobs.get(timeout=0.5)
         except queue.Empty:
@@ -156,9 +157,14 @@ def transcribe_loop(jobs: queue.Queue[SegmentJob], stop_event) -> None:
                 debug(f"[{job.feed_name}] dropped stale segment age={age:.1f}s path={job.path.name}")
                 continue
 
-            result = model.transcribe(str(job.path))
-            text = normalize_text(extract_text(result))
-            normalized_text = normalize_radio_language(text, scanner_codes, radio_aliases, phonetics)
+            text = normalize_text(transcribe_segment(job.path, model, job.feed_name))
+            normalized_text = normalize_radio_language(
+                text,
+                scanner_codes,
+                radio_aliases,
+                phonetics,
+                feed_name=job.feed_name,
+            )
 
             if len(normalized_text.split()) < MIN_WORDS and not looks_like_radio_code(normalized_text, scanner_codes):
                 debug(f"[{job.feed_name}] dropped short transcript: {text!r}")
@@ -172,7 +178,7 @@ def transcribe_loop(jobs: queue.Queue[SegmentJob], stop_event) -> None:
                 debug(f"[{job.feed_name}] dropped duplicate: {normalized_text!r}")
                 continue
 
-            writer.append(job, normalized_text, text)
+            writer.append(job, normalized_text, text, age)
 
         except Exception as exc:
             print(f"[{job.feed_name}] failed to transcribe {job.path.name}: {exc}", flush=True)
