@@ -51,6 +51,13 @@ check_docker_container() {
 start_service() {
     print_status "Starting Scanner Feed Service..."
     
+    # Check if launchd service is loaded, if not load it
+    if ! launchctl print "gui/$(id -u)/$PARAKEET_SERVICE" > /dev/null 2>&1; then
+        print_status "Loading launchd service..."
+        launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.scanner-feed.parakeet.plist"
+        sleep 2
+    fi
+    
     # Start Parakeet server
     print_status "Starting Parakeet server (native MLX)..."
     launchctl kickstart -k "gui/$(id -u)/$PARAKEET_SERVICE"
