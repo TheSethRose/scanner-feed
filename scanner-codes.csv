@@ -1,0 +1,174 @@
+code_type,code,meaning,category,notes
+10-Code,10-0,Use Caution / Officer Down (regional),Emergency,APCO standard. Some regions: fatality or officer down
+10-Code,10-1,Signal Weak / Unable to Copy,Communication,APCO standard
+10-Code,10-2,Signal Good,Communication,APCO standard
+10-Code,10-3,Stop Transmitting,Communication,APCO standard
+10-Code,10-4,Acknowledged / Message Received / OK,Communication,Universal. Most recognized code
+10-Code,10-5,Relay Message To,Communication,APCO standard
+10-Code,10-6,Busy / Stand By Unless Urgent,Status,APCO standard
+10-Code,10-7,Out of Service,Status,APCO standard. Often followed by reason code
+10-Code,10-8,In Service / Available,Status,APCO standard
+10-Code,10-9,Repeat / Say Again,Communication,APCO standard
+10-Code,10-10,Fight In Progress / Negative (regional),Incident,APCO: fight. Some regions: negative/no
+10-Code,10-11,Dog Case / Animal Problem / On Duty,Incident,APCO: dog case. Some regions: on duty
+10-Code,10-12,Stand By / Visitors Present,Communication,APCO standard
+10-Code,10-13,Weather-Road Report / Existing Conditions,Info,APCO standard
+10-Code,10-14,Prowler Report / Message or Information,Incident,APCO: prowler. Some regions: message info
+10-Code,10-15,Civil Disturbance / Prisoner in Custody,Incident,APCO: civil disturbance. Many regions: prisoner custody
+10-Code,10-16,Domestic Problem / Pick Up Prisoner,Incident,APCO: domestic. Many regions: pick up prisoner
+10-Code,10-17,Meet Complainant / Pick Up Papers,Action,APCO: meet complainant. Some: pick up papers
+10-Code,10-18,Urgent / Complete Assignment Quickly,Action,APCO standard
+10-Code,10-19,Return To Station / In Contact,Action,APCO: return. Some regions: in contact
+10-Code,10-20,Location / What Is Your Location,Info,Universal. 'What's your 20?'
+10-Code,10-21,Call By Telephone,Action,APCO standard
+10-Code,10-22,Disregard / Cancel,Action,APCO standard
+10-Code,10-23,Arrived At Scene / On Location,Status,APCO standard. Critical status code
+10-Code,10-24,Assignment Completed,Status,APCO standard
+10-Code,10-25,Report In Person / Meet At,Action,APCO standard
+10-Code,10-26,Detaining Subject / ETA,Incident,APCO: detaining. Some regions: estimated arrival
+10-Code,10-27,License Information / Drivers License Check,Info,APCO standard
+10-Code,10-28,Vehicle Registration Information,Info,APCO standard
+10-Code,10-29,Check For Wanted / Warrant Check,Info,APCO standard. Stolen/wanted check
+10-Code,10-30,Unnecessary Use Of Radio / Danger Caution,Status,APCO: unnecessary radio. Some: danger
+10-Code,10-31,Crime In Progress,Incident,APCO standard. High priority
+10-Code,10-32,Man With Gun / Person With Gun,Incident,APCO standard. Armed subject
+10-Code,10-33,Emergency / Help Quick / Radio Silence,Emergency,APCO: emergency. Universal emergency code
+10-Code,10-34,Riot / Major Disturbance / Time,Incident,APCO: riot. Some regions: time request
+10-Code,10-35,Major Crime Alert,Incident,APCO standard
+10-Code,10-36,Correct Time,Info,APCO standard
+10-Code,10-37,Suspicious Vehicle / Investigate,Incident,APCO standard
+10-Code,10-38,Stopping Suspicious Vehicle,Action,APCO standard. Traffic stop
+10-Code,10-39,Urgent - Use Lights And Siren,Emergency,APCO standard. Code 3 response
+10-Code,10-40,Silent Run - No Lights/Siren,Action,APCO standard. Stealth approach
+10-Code,10-41,Beginning Tour Of Duty,Status,APCO standard. Start of shift
+10-Code,10-42,Ending Tour Of Duty,Status,APCO standard. End of shift / officer memorial
+10-Code,10-43,Information,Info,APCO standard
+10-Code,10-44,Permission To Leave,Status,APCO standard
+10-Code,10-45,Animal Carcass / Dead Body / Fatality,Incident,APCO: carcass. Many regions: dead body
+10-Code,10-46,Assist Motorist,Action,APCO standard
+10-Code,10-47,Emergency Road Repair Needed,Action,APCO standard
+10-Code,10-48,Traffic Standard Repair Needed,Action,APCO standard
+10-Code,10-49,Traffic Light Out / En Route To Assignment,Action,APCO: traffic light. Some: en route
+10-Code,10-50,Accident (F/PI/PD),Incident,"APCO standard. F=Fatal, PI=Personal Injury, PD=Property Damage"
+10-Code,10-51,Wrecker Needed / Tow Truck,Action,APCO standard
+10-Code,10-52,Ambulance Needed,Emergency,APCO standard
+10-Code,10-53,Road Blocked,Incident,APCO standard
+10-Code,10-54,Livestock On Highway / Hit And Run,Incident,APCO: livestock. Some: hit and run
+10-Code,10-55,Intoxicated Driver / Security Check,Incident,APCO: intoxicated driver. Some: security check
+10-Code,10-56,Intoxicated Pedestrian,Incident,APCO standard
+10-Code,10-57,Hit And Run,Incident,APCO standard
+10-Code,10-58,Direct Traffic,Action,APCO standard
+10-Code,10-59,Convoy Or Escort,Action,APCO standard
+10-Code,10-60,Squad In Vicinity / Lock Out,Status,APCO standard
+10-Code,10-61,Personnel In Area,Status,APCO standard
+10-Code,10-62,Reply To Message,Communication,APCO standard
+10-Code,10-63,Prepare To Copy / Make Written Copy,Communication,APCO standard
+10-Code,10-64,Message For Local Delivery,Communication,APCO standard
+10-Code,10-65,Net Message Assignment,Communication,APCO standard
+10-Code,10-66,Message Cancellation,Communication,APCO standard
+10-Code,10-67,Clear For Net Message / Person Calling For Help,Communication,APCO: clear net. Some: person needs help
+10-Code,10-68,Dispatch Information,Communication,APCO standard
+10-Code,10-69,Message Received,Communication,APCO standard
+10-Code,10-70,Fire Alarm / Prowler,Emergency,APCO: fire alarm. Some regions: prowler
+10-Code,10-71,Advise Nature Of Fire / Gun Involved,Emergency,APCO: nature of fire. Some: gun involved
+10-Code,10-72,Report Progress On Fire / Shooting,Emergency,APCO: fire progress. Some: shooting
+10-Code,10-73,Smoke Report,Emergency,APCO standard
+10-Code,10-74,Negative / No,Communication,APCO standard
+10-Code,10-75,In Contact With,Status,APCO standard
+10-Code,10-76,En Route,Status,APCO standard
+10-Code,10-77,ETA (Estimated Time Of Arrival),Info,APCO standard
+10-Code,10-78,Need Assistance / Officer Needs Help,Emergency,APCO standard. Assist officer
+10-Code,10-79,Notify Coroner / Bomb Threat (regional),Emergency,APCO: notify coroner. Some: bomb threat
+10-Code,10-80,Pursuit In Progress / Chase,Emergency,APCO standard. Vehicle pursuit
+10-Code,10-81,Breathalyzer Report,Info,APCO standard
+10-Code,10-82,Reserve Lodging,Action,APCO standard
+10-Code,10-83,Work School Crossing,Action,APCO standard
+10-Code,10-84,If Meeting Advised ETA,Action,APCO standard
+10-Code,10-85,Delay Due To,Status,APCO standard
+10-Code,10-86,Officer On Duty,Status,APCO standard
+10-Code,10-87,Pickup / Distribute Checks,Action,APCO standard
+10-Code,10-88,Present Telephone Number,Info,APCO standard
+10-Code,10-89,Bomb Threat,Emergency,APCO standard
+10-Code,10-90,Bank Alarm,Emergency,APCO standard
+10-Code,10-91,Pick Up Prisoner / Subject,Action,APCO standard
+10-Code,10-92,Improperly Parked Vehicle,Incident,APCO standard
+10-Code,10-93,Blockade / Road Closed,Action,APCO standard
+10-Code,10-94,Drag Racing,Incident,APCO standard
+10-Code,10-95,Prisoner / Subject In Custody,Incident,APCO standard
+10-Code,10-96,Mental Subject / Psych Patient,Incident,APCO standard
+10-Code,10-97,Check Signal / Arrived At Scene (regional),Status,APCO: check signal. CA and others: on scene
+10-Code,10-98,Prison Break / Jail Break / Assignment Complete,Emergency,APCO: prison break. Some: task complete
+10-Code,10-99,Wanted / Stolen Indicated / Officer Needs Help,Emergency,APCO: wanted/stolen. Some: officer emergency
+10-Code,10-100,Restroom Break / Dead Body Found,Status,APCO: restroom. Some regions: dead body
+10-Code,10-101,What Is Status / Are You Secure,Communication,APCO standard
+10-Code,10-106,Secure / Status Is Secure,Status,APCO standard
+10-Code,10-200,Alarm,Emergency,APCO standard
+10-Code,10-999,Officer Down / Officer Needs Help Immediately,Emergency,Emergency SOS. All units respond
+Response Code,Code 1,Respond At Convenience / Non-Urgent,Response,No lights/siren
+Response Code,Code 2,Respond Urgently / No Lights-Siren,Response,"Immediate response, no emergency equipment"
+Response Code,Code 3,Emergency - Lights And Siren,Response,Highest priority response
+Response Code,Code 4,No Further Assistance Needed / Under Control,Response,Situation contained. Universal
+Response Code,Code 5,Stakeout - Uniformed Stay Away,Response,Undercover operation in progress
+Response Code,Code 6,Out Of Vehicle For Investigation,Response,Officer out of car
+Response Code,Code 7,Out Of Service To Eat,Status,Meal break
+Response Code,Code 8,Fire Alarm,Emergency,Fire response
+Response Code,Code 9,Roadblock,Action,Road closed
+Response Code,Code 10,Bomb Threat,Emergency,Bomb response
+Response Code,Code 13,Major Disaster Activation,Emergency,Mass casualty/disaster
+Response Code,Code 14,Resume Normal Operation,Status,Return to normal
+Response Code,Code 20,Notify News Media,Action,Press notification
+Response Code,Code 22,Restricted Radio Traffic,Communication,Limit radio use
+Response Code,Code 30,Officer Needs Emergency Assistance,Emergency,All units respond
+Response Code,Code 33,Clear Radio Channel - Emergency Traffic Only,Emergency,Radio silence except emergencies
+Response Code,Code 37,Subject-Property Wanted,Info,Wanted notification
+Response Code,Code 100,In Position To Intercept,Action,Pursuit/tactical position
+EMS Code,Priority 1,Life Threatening Emergency,EMS,Lights and siren
+EMS Code,Priority 2,Serious But Not Life Threatening,EMS,"Urgent, may use lights"
+EMS Code,Priority 3,Non-Emergency / Routine,EMS,No lights/siren
+EMS Code,Priority 4,Non-Transport / Minor,EMS,Patient refusal or minor
+Dispatch Signal,Signal 1,Drunk Driver,Incident,Common in TX
+Dispatch Signal,Signal 2,Intoxicated Person,Incident,Common in TX
+Dispatch Signal,Signal 3,Hit And Run,Incident,Common in TX
+Dispatch Signal,Signal 4,Accident,Incident,Common in TX
+Dispatch Signal,Signal 5,Murder,Incident,Common in TX
+Dispatch Signal,Signal 6,Escaped Prisoner,Incident,Common in TX
+Dispatch Signal,Signal 7,Dead Body,Incident,Common in TX
+Dispatch Signal,Signal 8,Missing Person,Incident,Common in TX
+Dispatch Signal,Signal 9,Stolen Vehicle,Incident,Common in TX
+Dispatch Signal,Signal 10,Stolen Items,Incident,Common in TX
+Dispatch Signal,Signal 11,Hit And Run - Injury,Incident,Common in TX
+Dispatch Signal,Signal 12,Reckless Driving,Incident,Common in TX
+Dispatch Signal,Signal 13,Suspicious Person,Incident,Common in TX
+Dispatch Signal,Signal 14,Information,Info,Common in TX
+Dispatch Signal,Signal 15,Special Detail,Status,Common in TX
+Dispatch Signal,Signal 16,Domestic Disturbance,Incident,Common in TX
+Dispatch Signal,Signal 17,Complaint,Incident,Common in TX
+Dispatch Signal,Signal 18,Felony In Progress,Incident,Common in TX
+Dispatch Signal,Signal 19,Misdemeanor,Incident,Common in TX
+Dispatch Signal,Signal 20,Mental Subject,Incident,Common in TX
+Dispatch Signal,Signal 21,Burglary In Progress,Incident,Common in TX
+Dispatch Signal,Signal 22,Disturbance,Incident,Common in TX
+Dispatch Signal,Signal 23,Hold-Up,Incident,Common in TX
+Dispatch Signal,Signal 24,Prowler,Incident,Common in TX
+Dispatch Signal,Signal 25,Fire,Emergency,Common in TX
+Dispatch Signal,Signal 26,Detain Subject,Action,Common in TX
+Dispatch Signal,Signal 27,License Check,Info,Common in TX
+Dispatch Signal,Signal 28,Registration Check,Info,Common in TX
+Dispatch Signal,Signal 29,Reckless Driver,Incident,Common in TX
+Dispatch Signal,Signal 30,Bomb Threat,Emergency,Common in TX
+Dispatch Signal,Signal 31,Crime In Progress,Incident,Common in TX
+Dispatch Signal,Signal 32,Gun Involved,Incident,Common in TX
+Dispatch Signal,Signal 33,Emergency - Radio Silence,Emergency,Common in TX
+Dispatch Signal,Signal 34,Assault,Incident,Common in TX
+Dispatch Signal,Signal 35,Rape,Incident,Common in TX
+Dispatch Signal,Signal 36,Shooting,Incident,Common in TX
+Dispatch Signal,Signal 37,Stabbing,Incident,Common in TX
+Dispatch Signal,Signal 38,Officer In Danger,Emergency,Common in TX
+Dispatch Signal,Signal 39,Road Block,Action,Common in TX
+Dispatch Signal,Signal 40,Fight,Incident,Common in TX
+Dispatch Signal,Signal 50,Dispatch Duty,Status,Common in TX
+Dispatch Signal,Signal 60,Open Door-Window,Incident,Common in TX
+Dispatch Signal,Signal 70,Improper Parking,Incident,Common in TX
+Dispatch Signal,Signal 80,Explosion,Emergency,Common in TX
+Dispatch Signal,Signal 90,Hostage Situation,Emergency,Common in TX
+Dispatch Signal,Signal 100,Resume Normal Traffic,Status,Common in TX
